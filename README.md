@@ -4,6 +4,10 @@ feather2的vue模块热更新，无需刷新页面，修改.vue文件即可看�
 
 ### 使用
 
+```sh
+npm install feather2-hook-vuehot --save-dev
+```
+
 conf/conf.js
 
 ```js
