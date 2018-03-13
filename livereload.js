@@ -1,6 +1,6 @@
 var _ = fis.util;
 var portfinder = require('portfinder');
-var rLivereload = /"(?:[^\\"\r\n\f]|\\[\s\S])*"|'(?:[^\\'\n\r\f]|\\[\s\S])*'|(<\/body>|<!--livereload-->)/ig;
+var rLivereload = /"(?:[^\\"\r\n\f]|\\[\s\S])*"|'(?:[^\\'\n\r\f]|\\[\s\S])*'|(<body>|<!--livereload-->)/ig;
 var LRServer;
 var LRPORT;
 
