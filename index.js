@@ -6,6 +6,7 @@ var INJECT = feather.util.read(__dirname + '/vendor/inject.js');
 var INJECT_FILE;
 
 module.exports = function(feather, opt){
+
 	var modified;
 	var config = feather.config.get('cli');
 
@@ -54,24 +55,30 @@ module.exports = function(feather, opt){
 				});
 				file.setContent(content)
 			}
-		});
+		});	
 
-		var paths = [];
-
-		function getUrl(id){
-			return ret.map[id] ? ret.map[id].url : modified[i].getUrl();
-		}
-
-		for(var i in modified){
-			if(!modified[i].isCssLike){
-				paths.push(i + '!!!' + getUrl(i));
-			}else{
-				paths.push(i + '!!!' + (ret.map[i] ? getUrl(ret.map[i].pkg || i) : modified[i].getUrl()));
-			}
+		if(!ret.pkg['/map.json'].release){
+			ret.pkg['/map.json'].release = '/view/map.json';
 		}
 
 		modified = {};
 		process.nextTick(function(){
+			let json = JSON.parse(ret.pkg['/map.json'].getContent());
+
+			var paths = [];
+
+			function getUrl(id){
+				return json[id].url;
+			}
+
+			for(var i in modified){
+				if(!modified[i].isCssLike){
+					paths.push(i + '!!!' + getUrl(i));
+				}else{
+					paths.push(i + '!!!' + (ret.map[i] ? getUrl(ret.map[i].pkg || i) : modified[i].getUrl()));
+				}
+			}
+
 			reload(paths);
 		})
 	});

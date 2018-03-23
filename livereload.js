@@ -63,7 +63,7 @@ function makeLiveServer(callback) {
 
   // fix mac livereload
   process.on('uncaughtException', function(err) {
-    if (err.message !== 'read ECONNRESET') throw err;
+    //if (err.message !== 'read ECONNRESET') throw err;
   });
 
 

@@ -12,4 +12,6 @@ conf/conf.js
 
 ```js
 feather.hook('vuehot');
+//如果ip不对，可进行设置, 正常为127.0.0.1
+feather.config.set('livereload.hostname', 'ip');
 ```
