@@ -22,6 +22,7 @@ Module.prototype.execute = function(){
 var links = [];
 
 Module.createElement = function(url){
+	console.log(url)
 	var el = createElement(url);
 	el.$$ids = urlStores[url].modules.slice();
 	return el;
@@ -61,11 +62,10 @@ LiveReload.reloader.reload = function(path, options){
 		var foundLink;
 		var ids = [id];
 
-		delete Module.urlStores[url];
-
 		[].some.call(links, function(link){
 			if(link.$$ids && link.$$ids.indexOf(id) > -1){
 				ids = link.$$ids.map(function(id){
+					delete Module.urlStores[Module.stores[id].url];
 					delete Module.stores[id];
 					return id;
 				});
@@ -80,16 +80,25 @@ LiveReload.reloader.reload = function(path, options){
 
 		for(var currentUrl in maps){
 			if(maps[currentUrl].indexOf(id) > -1){
-				map[url] = maps[currentUrl];
-				delete maps[currentUrl];
-				break;
+				if(map[url] != maps[currentUrl]){
+					map[url] = maps[currentUrl];
+					delete maps[currentUrl];
+					break;
+				}
 			}
 		}
+		
+		var need = false;
 
-		require.config('map', map);
-		require.async(ids, function(){
-			foundLink.parentNode.removeChild(foundLink);
-		});
+		for(var i in map){
+			need = true;
+		}
+
+		if(need){
+			foundLink && foundLink.parentNode && foundLink.parentNode.removeChild(foundLink);
+			require.config('map', map);
+			require.async(ids);
+		}
 
 		return;
 	}else if(/js/.test(url)){
