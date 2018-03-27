@@ -4,6 +4,7 @@ var handleReloadComment = require('./livereload').handleReloadComment;
 var HOT = feather.util.read(__dirname + '/vendor/hotapi.js');
 var INJECT = feather.util.read(__dirname + '/vendor/inject.js');
 var INJECT_FILE;
+var all;
 
 module.exports = function(feather, opt){
 
@@ -37,6 +38,7 @@ module.exports = function(feather, opt){
 	});	
 
 	feather.on('release:end', function(ret){
+		all = ret;
 		handleReloadComment(ret.src);
 
 		ret.pkg['/inject__.js'] = INJECT_FILE;
@@ -58,28 +60,29 @@ module.exports = function(feather, opt){
 		});	
 
 		if(!ret.pkg['/map.json'].release){
-			ret.pkg['/map.json'].release = '/view/map.json';
+			ret.pkg['/map.json'].release = '/static/map.json';
+		}
+	});
+
+	feather.on('deploy:end', function(){
+		let json = JSON.parse(all.pkg['/map.json'].getContent());
+
+		var paths = [];
+
+		function getUrl(id){
+			return json[id].url;
 		}
 
+		for(var i in modified){
+			if(!modified[i].isCssLike){
+				paths.push(i + '!!!' + getUrl(i));
+			}else{
+				paths.push(i + '!!!' + (all.map[i] ? getUrl(all.map[i].pkg || i) : modified[i].getUrl()));
+			}
+		}
+
+		all = {};
 		modified = {};
-		process.nextTick(function(){
-			let json = JSON.parse(ret.pkg['/map.json'].getContent());
-
-			var paths = [];
-
-			function getUrl(id){
-				return json[id].url;
-			}
-
-			for(var i in modified){
-				if(!modified[i].isCssLike){
-					paths.push(i + '!!!' + getUrl(i));
-				}else{
-					paths.push(i + '!!!' + (ret.map[i] ? getUrl(ret.map[i].pkg || i) : modified[i].getUrl()));
-				}
-			}
-
-			reload(paths);
-		})
-	});
+		reload(paths);
+	})
 };
