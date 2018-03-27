@@ -70,8 +70,7 @@ module.exports = function(feather, opt){
 			return;
 		}
 
-		let json = JSON.parse(map.getContent());
-
+		var json = JSON.parse(map.getContent());
 		var paths = [];
 
 		function getUrl(id){
