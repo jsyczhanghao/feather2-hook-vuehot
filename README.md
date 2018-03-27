@@ -1,6 +1,7 @@
 # feather2-hook-vuehot
 
 feather2的vue模块热更新，无需刷新页面，修改.vue文件即可看到效果，同webpack
+注: 只有dev或者debug 环境下，启动watch功能此功能才会生效
 
 ### 使用
 

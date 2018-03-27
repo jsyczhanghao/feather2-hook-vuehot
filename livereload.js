@@ -29,45 +29,56 @@ function makeLiveServer(callback) {
   if (LRServer) return callback(null, LRServer, LRPORT);
 
   var basePort = fis.media().get('livereload.port', 8132);
-  var port = LRPORT = basePort;
-  var LiveReloadServer = require('livereload-server-spec');
 
-  LRServer = new LiveReloadServer({
-    id: 'com.baidu.fis',
-    name: 'fis-reload',
-    version: fis.cli.info.version,
-    port: port,
-    protocols: {
-      monitoring: 7
+  // 获取下一个可用端口。
+  portfinder.getPort({
+    port: basePort
+  }, function(error, port) {
+    if (error) {
+      fis.log.warn('The port %s for livereload is already in use!', basePort);
+      return callback(error);
     }
-  });
 
-  LRServer.on('livereload.js', function(req, res) {
-    var script = fis.util.fs.readFileSync(__dirname + '/vendor/livereload.js');
-    res.writeHead(200, {
-      'Content-Length': script.length,
-      'Content-Type': 'text/javascript',
-      'Connection': 'close'
+    LRPORT = port;
+    var LiveReloadServer = require('livereload-server-spec');
+
+    LRServer = new LiveReloadServer({
+      id: 'com.baidu.fis',
+      name: 'fis-reload',
+      version: fis.cli.info.version,
+      port: port,
+      protocols: {
+        monitoring: 7
+      }
     });
-    res.end(script);
+
+    LRServer.on('livereload.js', function(req, res) {
+      var script = fis.util.fs.readFileSync(__dirname + '/vendor/livereload.js');
+      res.writeHead(200, {
+        'Content-Length': script.length,
+        'Content-Type': 'text/javascript',
+        'Connection': 'close'
+      });
+      res.end(script);
+    });
+
+    LRServer.listen(function(err) {
+      if (err) {
+        err.message = 'LiveReload server Listening failed: ' + err.message;
+        fis.log.error(err);
+      }
+    });
+
+    process.stdout.write('\n Ψ '.bold.yellow + port + '\n');
+
+    // fix mac livereload
+    process.on('uncaughtException', function(err) {
+      //if (err.message !== 'read ECONNRESET') throw err;
+    });
+
+
+    callback(null, LRServer, LRPORT);
   });
-
-  LRServer.listen(function(err) {
-    if (err) {
-      err.message = 'LiveReload server Listening failed: ' + err.message;
-      fis.log.error(err);
-    }
-  });
-
-  process.stdout.write('\n Ψ '.bold.yellow + port + '\n');
-
-  // fix mac livereload
-  process.on('uncaughtException', function(err) {
-    //if (err.message !== 'read ECONNRESET') throw err;
-  });
-
-
-  callback(null, LRServer, LRPORT);
 }
 
 function reload(paths) {
