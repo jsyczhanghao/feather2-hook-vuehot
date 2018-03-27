@@ -22,7 +22,6 @@ Module.prototype.execute = function(){
 var links = [];
 
 Module.createElement = function(url){
-	console.log(url)
 	var el = createElement(url);
 	el.$$ids = urlStores[url].modules.slice();
 	return el;
