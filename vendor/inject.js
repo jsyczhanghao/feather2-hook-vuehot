@@ -27,7 +27,8 @@ Module.createElement = function(url){
 	return el;
 };
 
-var reload = LiveReload.reloader.reload;
+if(window.LiveReload){
+	var reload = LiveReload.reloader.reload;
 
 LiveReload.reloader.reload = function(path, options){
 	var temp = path.split('!!!');
@@ -105,5 +106,7 @@ LiveReload.reloader.reload = function(path, options){
 		return;
 	}
 
-	reload.call(this, url, options)
+	reload.call(this, url, options);	
+}
+
 };
